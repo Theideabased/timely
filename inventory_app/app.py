@@ -124,7 +124,7 @@ conf = ConnectionConfig(
 @app.post('email/{product_id}')
 async def send_email(product_id: int, content: EmailContent):
 
-    product = await Product.get(id = product_id)
+    product = await Products.get(id = product_id)
     supplier = await product.supplied_by
     supplier_email = [supplier.email]
 
@@ -137,16 +137,16 @@ async def send_email(product_id: int, content: EmailContent):
     <h6>Timely Business LTD</h6>
     """
     message = MessageSchema(
-            subject=content.subject,
-            recipients=supplier_email,
-            body=html,
-            subtype=MessageType.html)
+    subject=content.subject,
+    recipients=supplier_email,
+    body=html,
+    subtype=html,
+    )
 
     fm = FastMail(conf)
     await fm.send_message(message)
     return{"status": "ok"}
 
-        
 
 
 register_tortoise(
