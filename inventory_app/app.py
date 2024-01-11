@@ -5,14 +5,18 @@ from models import (supplier_pydantic, supplier_pydanticIn, Supplier, product_py
 
 #email
 from typing import List
-
-from fastapi import BackgroundTasks, FastAPI
+# from starlette.request import Request
+from fastapi import BackgroundTasks, FastAPI, UploadFile, File, Form
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
 
 # dotenv
-from dotenv import load_dotenv
+# from dotenv import dotenv_values
+
+# credentials
+# credentials = dotenv_values(".env")
+
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -121,27 +125,27 @@ conf = ConnectionConfig(
     VALIDATE_CERTS = True
 )
 
-@app.post('email/{product_id}')
-async def send_email(product_id: int, content: EmailContent):
 
+@app.post('/email/{product_id}')
+async def send_email(product_id: int, content: EmailContent):
     product = await Products.get(id = product_id)
     supplier = await product.supplied_by
     supplier_email = [supplier.email]
 
-    html = """
-    <h5>Timely Business LTD</h5>
-    <br>
-    <p>{content.message}</p>
-    <br>
-    <h6>Best Regards</h6>
+    html = f"""
+    <h5>Timely Business LTD</h5> 
+    <br> 
+    <p>{content.message}</p> 
+    <br> 
+    <h6>Best Regards</h6> 
     <h6>Timely Business LTD</h6>
     """
+    
     message = MessageSchema(
-    subject=content.subject,
-    recipients=supplier_email,
-    body=html,
-    subtype=html,
-    )
+        subject=content.subject,
+        recipients=supplier_email,
+        body=html,
+        subtype=MessageType.html)
 
     fm = FastMail(conf)
     await fm.send_message(message)
