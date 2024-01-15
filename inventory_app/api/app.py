@@ -11,17 +11,15 @@ from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
 
-# dotenv
-# from dotenv import dotenv_values
+# adding cors headers
+from fastapi.middleware.cors import CORSMiddleware
 
-# credentials
-# credentials = dotenv_values(".env")
 
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
 
-dotenv_path = join(dirname(__file__), '.env')
+dotenv_path = join(dirname(__file__), '../.env')
 load_dotenv(dotenv_path)
 
 EMAIL = os.environ.get("EMAIL")
@@ -30,6 +28,20 @@ PASS = os.environ.get("PASS")
 
 app = FastAPI()
 
+# adding cors urls
+
+origins = [
+    'http://localhost:3000'
+]
+
+# add middleware
+app.add_middleware (
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods = ['*'],
+    allow_headers = ['*']
+)
 @app.get('/')
 def index():
     return {"Msg": "go to /docs for the API documentation"}
